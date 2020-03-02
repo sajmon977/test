@@ -41,29 +41,10 @@ public class probCalc {
         double expVal = 0;
         double[][] cardProb = new double[2][];
 
-        /* HIT */ /*
-        System.out.println("Croupier \\ Player  HIT");
-        System.out.println("  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19");//*/
- /* AS */ /*
-        System.out.println("Croupier \\ Player  AS");
-        System.out.println("  2 3 4 5 6 7 8 9 10");//*/
- /* SPLIT */ /*
-        System.out.println("Croupier \\ Player  SPLIT");
-        System.out.println("  a 2 3 4 5 6 7 8 9 10");//*/
-
         cardProb[0] = Deck.prob();
         for (int i = 0; i < 10; i++) {
             if (Croupier.takeCard(i)) {
                 CroupierProb = CProbSave[i];
-
-                /* SPLIT */ /* AS */ /* HIT */ /*
-                if (i == 0) {
-                    System.out.print("a ");
-                } else if (i == 9) {
-                    System.out.print("10");
-                } else {
-                    System.out.print(i + 1 + " ");
-                }//*/
 
                 cardProb[1] = Deck.prob();
                 for (int j = 0; j < 10; j++) {
@@ -73,8 +54,6 @@ public class probCalc {
                         Player.returnCard();
                     }
                 }
-                /* SPLIT */ /* AS */ /* HIT */ /*
-                System.out.println();//*/
                 Croupier.returnCard();
             }
         }
@@ -102,52 +81,30 @@ public class probCalc {
     }
 
     double play(boolean split) {
-        if (!Player.isSize(2)) {
-            System.out.println("ERROR size should be 2");
-        }
-        double max = -8;
-        String choice = "";
+        if (Player.isSize(2)) {
+            double max = -8;
 
-        double temp = doubleDown();
-        if (temp > max) {
-            max = temp;
-            choice = "D";
-        }
-
-        if (split && Player.card(0) == Player.card(1)) {
-            temp = split();
+            double temp = doubleDown();
             if (temp > max) {
                 max = temp;
-                choice = "S";
             }
+
+            if (split && Player.card(0) == Player.card(1)) {
+                temp = split();
+                if (temp > max) {
+                    max = temp;
+                }
+            }
+
+            temp = expReturn();//strategy hit-stand
+            if (temp > max) {
+                max = temp;
+            }
+
+            return max;
+        } else {
+            throw new java.lang.Error("player hand size isn't 2 ");
         }
-
-        temp = expReturn();//strategy hit-stand
-        if (temp > max) {
-            max = temp;
-            /* SPLIT */ /* AS */ /* HIT */ /*
-            if (Player.hit()) {
-                choice = "H";
-            } else {
-                choice = "-";
-            }//*/
-        }
-        /* HIT */ /*
-        if (split && ((Player.card(0) > 1 && Player.card(1) == 1) || (Player.card(0) == 9 && Player.card(1) > 1 && Player.card(1) != 9))) {
-            System.out.print(choice + "  ");
-        }//*/
-
- /* AS */ /*
-        if (split && Player.card(0) != 9 && Player.card(1) == 0) {
-            System.out.print(choice + " ");
-        }//*/
-
- /* SPLIT */ /*
-        if (split && Player.card(0) == Player.card(1)) {
-            System.out.print(choice + " ");
-        }//*/
-
-        return max;
     }
 
     private double doubleDown() {
@@ -222,44 +179,127 @@ public class probCalc {
         return standWin;
     }
 
-    /*
-    void simulation() {
-        Croupier.takeCard(9);
-        Croupier.takeCard(5);
+    void print() {//works only with all cards in deck
+        System.out.println("Player \\ Croupier");
+        System.out.println("HIT   as 2  3  4  5  6  7  8  9 10");
 
-        simulate(1);
-        System.out.println(Arrays.toString(CroupierProb));
-    }
-
-    private void simulate(double prob) {
-        if (Croupier.hit()) {
-            double[] cardProb = Deck.prob();
+        Player.takeCard(1);
+        for (int j = 1; j < 10; j++) {
+            Player.takeCard(j);
+            System.out.print("   " + (j + 3) + " ");
+            if (j < 7) {
+                System.out.print(" ");
+            }
             for (int i = 0; i < 10; i++) {
                 if (Croupier.takeCard(i)) {
-                    simulate(cardProb[i] * prob);
+                    CroupierProb = CProbSave[i];
+                    System.out.print(playPrint(false));
                     Croupier.returnCard();
                 }
             }
-        } else {
-            System.out.print("prob = " + prob + "; ");
-            Croupier.print();
             System.out.println();
+            Player.returnCard();
+        }
+        Player.returnCard();
 
-            if (Croupier.score() > 21) {
-                CroupierProb[5] += prob;
-            } else {
-                CroupierProb[Croupier.score() - 17] += prob;
+        Player.takeCard(9);
+        for (int j = 1; j < 10; j++) {
+            Player.takeCard(j);
+            System.out.print("   " + (j + 11) + " ");
+
+            for (int i = 0; i < 10; i++) {
+                if (Croupier.takeCard(i)) {
+                    CroupierProb = CProbSave[i];
+                    System.out.print(playPrint(false));
+                    Croupier.returnCard();
+                }
             }
+            System.out.println();
+            Player.returnCard();
+        }
+        Player.returnCard();
+
+        System.out.println();
+        System.out.println("AS    as 2  3  4  5  6  7  8  9 10");
+
+        Player.takeCard(0);
+        for (int j = 0; j < 10; j++) {
+            Player.takeCard(j);
+            System.out.print("   ");
+            if (j == 0) {
+                System.out.print("as ");
+            } else if (j == 9) {
+                System.out.print("10 ");
+            } else {
+                System.out.print(j + 1 + "  ");
+            }
+            for (int i = 0; i < 10; i++) {
+                if (Croupier.takeCard(i)) {
+                    CroupierProb = CProbSave[i];
+                    System.out.print(playPrint(false));
+                    Croupier.returnCard();
+                }
+            }
+            System.out.println();
+            Player.returnCard();
+        }
+        Player.returnCard();
+
+        System.out.println();
+        System.out.println("SPLIT as 2  3  4  5  6  7  8  9 10");
+
+        for (int j = 0; j < 10; j++) {
+            Player.takeCard(j);
+            Player.takeCard(j);
+
+            System.out.print("   ");
+            if (j == 0) {
+                System.out.print("as ");
+            } else if (j == 9) {
+                System.out.print("10 ");
+            } else {
+                System.out.print(j + 1 + "  ");
+            }
+            for (int i = 0; i < 10; i++) {
+                if (Croupier.takeCard(i)) {
+                    CroupierProb = CProbSave[i];
+                    System.out.print(playPrint(true));
+                    Croupier.returnCard();
+                }
+            }
+            System.out.println();
+            Player.returnCard();
+            Player.returnCard();
         }
     }
 
-    void print(double prob) {
-        System.out.print("prob: " + prob + "; ");
-        Croupier.print();
-        System.out.print("; ");
-        Player.print();
-        System.out.println();
+    String playPrint(boolean split) {
+        double max = -8;
+        String choice = "";
+
+        double temp = doubleDown();
+        if (temp > max) {
+            max = temp;
+            choice = "D";
+        }
+
+        if (split && Player.card(0) == Player.card(1)) {
+            temp = split();
+            if (temp > max) {
+                max = temp;
+                choice = "S";
+            }
+        }
+
+        temp = expReturn();
+        if (temp > max) {
+            max = temp;
+            if (Player.hit()) {
+                choice = "H";
+            } else {
+                choice = "-";
+            }
+        }
+        return choice + "  ";
     }
-    
-     */
 }

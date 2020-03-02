@@ -9,7 +9,7 @@ public class genetic {
     int[] size = {9 * 10, 9 * 10}; //HIT, AS
     int population = 200;
     int survive = 20;
-    int mutation = 2;
+    int mutation = 3;
     int mutationRate = 10;
     int bestRate = 10;
 
@@ -38,24 +38,13 @@ public class genetic {
         }
     }
 
-    void start() {
-        int[][] tab = {{0, 1, 2, 3, 4, 9, 18, 54, 55, 56, 57, 58, 63, 64, 65, 66, 67, 72, 73, 74, 75, 76, 81, 82, 83, 84, 85},{0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 27, 28, 29, 30, 31, 32, 36, 37, 38, 39, 40, 41, 48, 49, 50, 54, 55, 56, 57, 58, 59, 63, 64, 65, 66, 67, 68, 72, 73, 74, 75, 76, 77, 78, 81, 82, 83, 84, 85, 86, 87}};
-
-        for (int i = 0; i < survive; i++) {
-
-            for (int j = 0; j < tab.length; j++) {
-                strategy[i][j].clear();
-
-                for (int k = 0; k < tab[j].length; k++) {
-                    strategy[i][j].set(tab[j][k]);
-                }
-            }
-        }
-    }
-
-    void run(int n) {
-        //start();
+    void run(int n, int m) {
         for (int i = 0; i < n; i++) {
+            generation();
+        }
+        mutation = 2;
+        mutationRate = 5;
+        for (int i = 0; i < m; i++) {
             generation();
         }
 
@@ -70,6 +59,7 @@ public class genetic {
             }
         }
         print(max);
+        Game.print();
     }
 
     void generation() {
@@ -86,20 +76,21 @@ public class genetic {
         int pos = 0;
         for (int i = 0; i < population; i++) {
             if (score[i] > max) {
-                strategy[pos] = strategy[i];
+                strategy[pos] = strategy[i].clone();
                 pos++;
                 best++;
             }
         }
         for (int i = 0; i < population; i++) {
             if (score[i] == max) {
-                strategy[pos] = strategy[i];
+                strategy[pos] = strategy[i].clone();
                 pos++;
             }
-            if (pos > survive) {
+            if (pos >= survive) {
                 break;
             }
         }
+
         System.out.println(score2[population - 1]);
         mutate();
     }
@@ -111,22 +102,18 @@ public class genetic {
 
         for (int i = 0; i < size.length; i++) {
             prob[i] = new int[size[i]];
-        }
-
-        for (int i = 0; i < best; i++) {
-            for (int j = 0; j < size.length; j++) {
-                for (int k = 0; k < size[j]; k++) {
-                    if (strategy[i][j].get(k)) {
-                        prob[j][k] += bestRate;
+            for (int j = 0; j < survive; j++) {
+                if (j < best) {
+                    for (int k = 0; k < size[i]; k++) {
+                        if (strategy[j][i].get(k)) {
+                            prob[i][k] += bestRate;
+                        }
                     }
-                }
-            }
-        }
-        for (int i = best; i < survive; i++) {
-            for (int j = 0; j < size.length; j++) {
-                for (int k = 0; k < size[j]; k++) {
-                    if (strategy[i][j].get(k)) {
-                        prob[j][k]++;
+                } else {
+                    for (int k = 0; k < size[i]; k++) {
+                        if (strategy[j][i].get(k)) {
+                            prob[i][k]++;
+                        }
                     }
                 }
             }

@@ -26,7 +26,7 @@ public class deck {
                 }
             }
         } else {
-            System.out.println("ERROR Deck.deck cards.length is:" + cards.length);
+            throw new java.lang.Error("cards.length: " + cards.length);
         }
     }
 
@@ -43,8 +43,7 @@ public class deck {
                 return true;
             }
         } else {
-            System.out.println("ERROR Deck.takeCard: " + card);
-            return false;
+            throw new java.lang.Error("card: " + card);
         }
     }
 
@@ -55,7 +54,7 @@ public class deck {
                 numberOfCards++;
             }
         } else {
-            System.out.println("ERROR Deck.giveCardBack: " + card);
+            throw new java.lang.Error("card: " + card);
         }
     }
 

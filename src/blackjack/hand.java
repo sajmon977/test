@@ -41,8 +41,7 @@ public class hand {
                 return false;
             }
         } else {
-            System.out.println("ERROR hand.takeCard, card: " + card + ", size: " + size + ", score: " + score);
-            return false;
+            throw new java.lang.Error("size: " + size + ", card: " + card + ", score: " + score);
         }
     }
 
@@ -68,7 +67,7 @@ public class hand {
             }
             size--;
         } else {
-            System.out.println("ERROR hand.returnCard, size: " + size);
+            throw new java.lang.Error("size: " + size);
         }
     }
 
